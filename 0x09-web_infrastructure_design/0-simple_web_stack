@@ -1,0 +1,47 @@
+One-Server Web Infrastructure Design for www.foobar.com
+🔵 Scenario
+A user opens a browser and types www.foobar.com. This request triggers a series of interactions across various components hosted on a single server.
+________________________________________
+🖥️ Components Used
+•	1 Server – with IP address 8.8.8.8
+•	1 Web Server – Nginx
+•	1 Application Server – running the application code (e.g., Python/Node.js/PHP)
+•	1 Code Base – the actual application files
+•	1 Database – MySQL
+•	1 Domain Name – foobar.com, with a www subdomain pointing to 8.8.8.8
+________________________________________
+🔁 Flow of a User Request
+1.	User enters www.foobar.com in the browser.
+2.	The browser performs a DNS lookup to resolve www.foobar.com to the IP address 8.8.8.8.
+3.	The request reaches the Nginx web server on the server.
+4.	Nginx forwards the request to the application server (e.g., via FastCGI, WSGI, or reverse proxy).
+5.	The application may query the MySQL database for data.
+6.	The response is generated and passed back through Nginx.
+7.	The user sees the web page in their browser.
+________________________________________
+🧱 Component Roles
+•	Server: A physical or virtual machine that hosts all services (web, app, DB).
+•	Domain Name: Makes it easier to access the server using human-readable names instead of IPs.
+•	DNS A Record: The www record is an A record, which maps www.foobar.com to IP 8.8.8.8.
+•	Web Server (Nginx): Handles HTTP requests, serves static content, and proxies to the app server.
+•	Application Server: Runs the logic of the application (e.g., fetching data, handling user input).
+•	Database (MySQL): Stores and retrieves structured data for the application.
+•	Communication: The user’s browser communicates with the server over TCP/IP using the HTTP protocol.
+________________________________________
+📉 Infrastructure Limitations
+1.	Single Point of Failure (SPOF)
+If the server crashes, the entire website goes down.
+2.	No Redundancy
+No backups or replicas of web/app/db components.
+3.	Downtime During Maintenance
+Restarting the server (e.g., deploying new code) results in downtime.
+4.	Lack of Scalability
+One server cannot handle a high volume of traffic or large data loads.
+________________________________________
+
+
+
+
+
+
+

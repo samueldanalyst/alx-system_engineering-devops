@@ -1,0 +1,55 @@
+Three-Server Web Infrastructure Design for www.foobar.com
+________________________________________
+🔵 Scenario
+A user wants to access www.foobar.com. The request goes through a load balancer, which distributes traffic across multiple web servers. These in turn communicate with an application and database layer to return the requested content.
+________________________________________
+🧱 Infrastructure Components
+•	Server 1: Hosts the Load Balancer (HAProxy)
+•	Server 2: Hosts the Web Server (Nginx) + Application Server + Application Code
+•	Server 3: Hosts the Database (MySQL)
+________________________________________
+🔁 Request Flow
+1.	User enters www.foobar.com in the browser.
+2.	DNS resolves www.foobar.com to the IP of the load balancer (Server 1).
+3.	HAProxy load balances incoming HTTP requests across multiple backend servers.
+4.	HAProxy forwards the request to Server 2 running Nginx + Application Server.
+5.	Application queries the MySQL database on Server 3.
+6.	The response is sent back through HAProxy to the user.
+________________________________________
+🔧 Component Justification
+✅ Load Balancer (HAProxy)
+•	Why: Distributes traffic to avoid overloading one server.
+•	Distribution Algorithm: Round Robin – Requests are distributed in order across available backend servers.
+•	Setup: Configured as Active-Active.
+o	Active-Active: Multiple servers handle traffic simultaneously.
+o	Active-Passive: One server is active while another waits as backup (not used here).
+✅ Web Server (Nginx) + Application Server
+•	Why: Handles static assets, proxies requests to the application code (Python, Node.js, PHP, etc.).
+•	Combined on one server for simplicity, can be scaled out later.
+✅ Application Files
+•	Why: These contain the logic and views of the website and live on Server 2.
+✅ MySQL Database
+•	Why: Stores persistent structured data for the application.
+________________________________________
+🗄️ Database Cluster: Primary-Replica (Master-Slave)
+•	Primary (Master): Handles all write operations (INSERT, UPDATE, DELETE).
+•	Replica (Slave): Handles read-only operations (SELECT), syncing from the Primary in near real-time.
+In the application:
+•	Writes go to the Primary.
+•	Reads can be directed to a Replica to reduce load on the Primary.
+________________________________________
+🚨 Limitations and Issues
+❗ Single Points of Failure (SPOF)
+•	HAProxy (if not replicated)
+•	Single database (if Primary fails and no automatic failover)
+•	Application server (only one; if it fails, site goes down)
+🔐 Security Issues
+•	No firewall to restrict malicious access
+•	No HTTPS/SSL encryption – exposes sensitive data over the network
+📉 No Monitoring
+•	No logging or alert system in place (e.g., Prometheus, Grafana)
+•	No health checks or status dashboards
+________________________________________
+
+
+

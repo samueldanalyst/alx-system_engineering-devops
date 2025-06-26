@@ -1,0 +1,60 @@
+Application Server vs Web Server – Scalable Clustered Infrastructure
+📌 Purpose
+This infrastructure hosts a website such as www.foobar.com using a production-ready and scalable layout. It includes:
+•	A HAProxy load balancer cluster
+•	Separate servers for web server, application server, and database
+•	Clean separation of concerns and high availability setup
+________________________________________
+⚙️ Components Breakdown
+🔄 Load Balancer (HAProxy Cluster)
+•	Why: Balances incoming traffic between multiple web/application servers to ensure high availability and fault tolerance.
+•	Cluster Setup: Two HAProxy instances (active-passive) using keepalived or VRRP to share a virtual IP.
+o	If the primary fails, the secondary takes over with zero disruption.
+•	Distribution Algorithm: Uses round-robin to distribute requests evenly among backend servers.
+________________________________________
+🌐 Web Server (Nginx)
+•	Role: Handles HTTP requests, serves static files (HTML, CSS, JS, images).
+•	Why Separate: Reduces load on the application server, improves performance for static assets.
+________________________________________
+🧠 Application Server (e.g., Gunicorn, uWSGI, Node.js)
+•	Role: Executes dynamic business logic, processes requests, handles database interaction via the app codebase.
+•	Why Separate: Application logic can scale independently, isolates security and performance bottlenecks.
+________________________________________
+🗃️ Database Server (MySQL)
+•	Role: Stores persistent data (e.g., user records, posts, sessions).
+•	Why Separate: Protects sensitive data, allows for backups and replication strategies.
+________________________________________
+🧩 Server Infrastructure
+Server #	Role	Installed Components
+1	Load Balancer	HAProxy (active node)
+2	Web Server	Nginx
+3	App Server	Flask/Gunicorn or Node.js
+4	Database Server	MySQL
+5	Load Balancer	HAProxy (passive node)
+________________________________________
+🔍 Application Server vs Web Server
+Feature	Web Server (Nginx)	Application Server (Gunicorn, uWSGI, etc.)
+Handles static files	✅ Yes	❌ No
+Executes app logic	❌ No	✅ Yes
+Speed for static	⚡ Fast (optimized for static)	🐢 Slower
+Common examples	Nginx, Apache	uWSGI, Gunicorn, Node.js
+Load	Lower (static file focus)	Higher (business logic, computation-heavy)
+________________________________________
+➕ Why Each Component is Added
+Component	Reason for Inclusion
+Load Balancer	Ensures high availability and scalability
+Web Server	Optimized for serving static files quickly
+Application Server	Handles dynamic request processing
+Database Server	Manages persistent data securely
+________________________________________
+📉 Limitations / Considerations
+•	Single DB Server: Still a single point of failure; recommend replication setup (primary-replica).
+•	Security: Firewalls and HTTPS (SSL termination at load balancer) should be included.
+•	Monitoring: Needed to track performance (QPS, memory, CPU, error rates).
+________________________________________
+✅ Summary
+This infrastructure is modular, scalable, and robust, with:
+•	Split responsibilities for better resource allocation
+•	Load balancer clustering for high availability
+•	Clear separation of web, app, and data layers for performance and maintainability
+

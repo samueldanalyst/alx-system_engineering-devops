@@ -1,0 +1,51 @@
+🔐 Three-Server Web Infrastructure for www.foobar.com (Secured + Monitored)
+________________________________________
+🌐 Use Case
+A user accesses https://www.foobar.com. The traffic is securely routed through a load balancer, passed to the web/application server, and data is retrieved from a database. All components are secured, encrypted, and monitored.
+________________________________________
+🧱 Infrastructure Components
+1.	Server 1: Load Balancer (HAProxy) + SSL Termination + Firewall + Monitoring Client
+2.	Server 2: Web Server (Nginx) + Application Server + Firewall + Monitoring Client
+3.	Server 3: Database Server (MySQL) + Firewall + Monitoring Client
+________________________________________
+🔁 Flow of Request
+1.	User requests https://www.foobar.com.
+2.	DNS resolves www.foobar.com to the public IP of the load balancer.
+3.	Load balancer (HAProxy) with SSL certificate terminates HTTPS, decrypts traffic.
+4.	Load balancer routes traffic to Server 2 (Nginx + App).
+5.	Server 2 queries Server 3 (MySQL) for data.
+6.	Response is sent back to the user via the load balancer.
+________________________________________
+🔐 Additional Elements & Justification
+✅ Firewalls (3 total)
+•	Why: Block unauthorized traffic and allow only specific ports:
+o	Load balancer: allow port 443 (HTTPS)
+o	Web server: allow only from Load Balancer IPs
+o	DB server: allow only from Web/App server IPs
+•	Purpose: Minimize attack surface.
+✅ SSL Certificate (on Load Balancer)
+•	Why: Enables HTTPS for encrypted communication between the user and the server.
+•	Purpose: Prevents man-in-the-middle attacks, ensures data integrity and privacy.
+✅ Monitoring Clients (3 total – one per server)
+•	Why: Collect metrics (CPU, memory, traffic, disk), logs, and service health.
+•	Tool: Could be Sumo Logic, Prometheus, or Datadog.
+•	How it collects data: Each agent runs as a daemon and sends data to a centralized monitoring service.
+o	Collects system logs
+o	Parses application logs
+o	Exports metrics (e.g., request count, status codes)
+✅ QPS Monitoring (Queries Per Second)
+•	Add instrumentation (e.g., NGINX stub_status or HAProxy stats)
+•	Export to monitoring tool using an agent or exporter
+•	Set alerts for spikes or drops
+________________________________________
+📉 Infrastructure Limitations
+❌ SSL Termination at Load Balancer
+•	Issue: Traffic between load balancer and app server is unencrypted unless re-encrypted.
+•	Mitigation: Use end-to-end encryption (TLS from LB → Web server too).
+❌ Single MySQL Server Accepting Writes
+•	Issue: Single point of failure (SPOF), affects availability and write performance.
+•	Mitigation: Use Primary-Replica with failover or MySQL Cluster.
+❌ Servers Running All Components
+•	Issue: Tight coupling, resource contention, difficult to scale individual components.
+•	Mitigation: Use separation of concerns — separate web, app, and DB on different nodes or containers.
+
